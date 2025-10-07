@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Parul Campus Connect — Events & Clubs</title>
+  <meta name="description" content="Central place for Parul University events, clubs and courses.">
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --muted:#94a3b8; --glass: rgba(255,255,255,0.03);
+      --maxw:1100px; --radius:14px; --gap:18px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#071124 0%, #071827 100%);color:#e6eef6;line-height:1.35}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:20px}
+
+    header{display:flex;align-items:center;gap:18px}
+    .brand{display:flex;flex-direction:column}
+    .brand h1{margin:0;font-size:20px;letter-spacing:0.2px}
+    .brand p{margin:0;color:var(--muted);font-size:13px}
+
+    nav{margin-left:auto;display:flex;gap:10px;align-items:center}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+    .hero{margin-top:20px;display:grid;grid-template-columns:1fr 320px;gap:20px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03)}
+    .search{display:flex;gap:8px}
+    .search input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{padding:6px 10px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:var(--muted);font-size:13px}
+    .chip.active{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#021223;border:none}
+
+    /* Events list */
+    .events{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .event{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.03)}
+    .event h3{margin:0;font-size:16px}
+    .meta{display:flex;gap:6px;color:var(--muted);font-size:13px;margin-top:8px}
+    .tags{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted)}
+    .event .actions{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .interested{padding:8px 12px;border-radius:10px;border:none;background:transparent;color:var(--accent);cursor:pointer}
+    .interested.active{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#021223}
+
+    /* Sidebar */
+    .sidebar .section{margin-bottom:14px}
+    .club{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px}
+    .club .logo{width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,#0b1220,#092031);display:grid;place-items:center;font-weight:700}
+    .club p{margin:0}
+
+    /* Responsive */
+    @media (max-width:900px){.hero{grid-template-columns:1fr}.events{grid-template-columns:1fr}.wrap{padding:12px}}
+
+    footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* small admin form (non-functional) */
+    .admin-form{display:flex;flex-direction:column;gap:8px}
+    .admin-form input, .admin-form textarea{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+    .muted-sm{color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Parul Campus Connect</h1>
+        <p>One place for Parul University events, clubs & courses</p>
+      </div>
+      <nav>
+        <button class="btn" onclick="scrollToSection('events')">Events</button>
+        <button class="btn" onclick="scrollToSection('clubs')">Clubs</button>
+        <button class="btn" onclick="scrollToSection('contact')">Contact</button>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0">Upcoming at Parul University</h2>
+            <p class="muted-sm">Filter by department, search or mark Interested</p>
+          </div>
+          <div class="muted-sm">Logged in as: <strong>Student</strong></div>
+        </div>
+
+        <div style="margin-top:12px" class="search">
+          <input id="searchInput" placeholder="Search events, clubs or courses..." oninput="applyFilters()">
+          <button class="btn" onclick="document.getElementById('searchInput').value='';applyFilters()">Clear</button>
+        </div>
+
+        <div class="filters" id="deptChips">
+          <span class="chip active" data-dept="all" onclick="chooseDept(this)">All</span>
+          <span class="chip" data-dept="cse" onclick="chooseDept(this)">CSE</span>
+          <span class="chip" data-dept="ai" onclick="chooseDept(this)">AI</span>
+          <span class="chip" data-dept="mech" onclick="chooseDept(this)">MECH</span>
+          <span class="chip" data-dept="ece" onclick="chooseDept(this)">ECE</span>
+          <span class="chip" data-dept="meta" onclick="chooseDept(this)">All Clubs</span>
+        </div>
+
+        <div id="events" class="events">
+          <!-- Example events - you can add more in the HTML or populate from backend later -->
+          <article class="event" data-dept="cse" data-keywords="hackathon coding competition">
+            <h3>Inter-College Hackathon</h3>
+            <div class="meta"><div>📅 Oct 20, 2025</div><div>•</div><div>Location: Innovation Lab</div></div>
+            <p class="muted-sm">24-hour coding marathon. Open to CSE & AI students. Prizes & certificates.</p>
+            <div class="tags"><span class="tag">CSE</span><span class="tag">Competition</span><span class="tag">Free</span></div>
+            <div class="actions">
+              <div class="muted-sm">Organizer: Swift Coding Club</div>
+              <button class="interested" onclick="toggleInterested(this)">Interested</button>
+            </div>
+          </article>
+
+          <article class="event" data-dept="ai" data-keywords="workshop ai ml">
+            <h3>Intro to Machine Learning (Workshop)</h3>
+            <div class="meta"><div>📅 Nov 02, 2025</div><div>•</div><div>Location: Auditorium</div></div>
+            <p class="muted-sm">Hands-on workshop covering basics of ML. Limited seats.</p>
+            <div class="tags"><span class="tag">AI</span><span class="tag">Workshop</span><span class="tag">Paid</span></div>
+            <div class="actions"><div class="muted-sm">Organizer: AI Club</div>
+              <button class="interested" onclick="toggleInterested(this)">Interested</button>
+            </div>
+          </article>
+
+          <article class="event" data-dept="cse" data-keywords="club meeting swift coding">
+            <h3>Swift Coding Club — Weekly Meetup</h3>
+            <div class="meta"><div>📅 Every Friday</div><div>•</div><div>Location: Room C-204</div></div>
+            <p class="muted-sm">Practice sessions, mini-projects, and guest talks.</p>
+            <div class="tags"><span class="tag">Club</span><span class="tag">Free</span></div>
+            <div class="actions"><div class="muted-sm">Organizer: Swift Coding Club</div>
+              <button class="interested" onclick="toggleInterested(this)">Interested</button>
+            </div>
+          </article>
+
+          <article class="event" data-dept="mech" data-keywords="workshop cad robotics">
+            <h3>Robotics & CAD Hands-on</h3>
+            <div class="meta"><div>📅 Oct 30, 2025</div><div>•</div><div>Location: Mech Lab</div></div>
+            <p class="muted-sm">Learn basic robotics and CAD tools. Tools provided.</p>
+            <div class="tags"><span class="tag">MECH</span><span class="tag">Workshop</span><span class="tag">Free</span></div>
+            <div class="actions"><div class="muted-sm">Organizer: Robotics Club</div>
+              <button class="interested" onclick="toggleInterested(this)">Interested</button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <aside class="card sidebar">
+        <div class="section">
+          <h3 style="margin:0">Top Clubs</h3>
+          <div style="margin-top:8px" class="club">
+            <div class="logo">SC</div>
+            <div><strong>Swift Coding Club</strong><div class="muted-sm">Free • CSE</div></div>
+          </div>
+          <div style="margin-top:8px" class="club">
+            <div class="logo">AI</div>
+            <div><strong>AI Club</strong><div class="muted-sm">Paid course available • AI</div></div>
+          </div>
+          <div style="margin-top:8px" class="club">
+            <div class="logo">RC</div>
+            <div><strong>Robotics Club</strong><div class="muted-sm">Free • Mech</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h4 style="margin:0">Quick Filters</h4>
+          <div style="margin-top:8px" class="filters">
+            <button class="chip" onclick="filterByTag('Free')">Free</button>
+            <button class="chip" onclick="filterByTag('Paid')">Paid</button>
+            <button class="chip" onclick="filterByTag('Workshop')">Workshops</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h4 style="margin:0">Add Event (Admin)</h4>
+          <p class="muted-sm">Non-functional demo form — can be wired to backend.</p>
+          <form class="admin-form" onsubmit="event.preventDefault();alert('This form is demo-only. Backend required to save events.')">
+            <input placeholder="Event title" required>
+            <input placeholder="Date / Recurrence">
+            <input placeholder="Department (cse/ai/mech/ece)">
+            <textarea rows="3" placeholder="Short description"></textarea>
+            <button class="btn" type="submit">Add (Demo)</button>
+          </form>
+        </div>
+
+        <div class="section">
+          <h4 style="margin:0">Contact</h4>
+          <p class="muted-sm">Email: studentsupport@parul.edu (example)</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer id="contact">Made with ❤ for Parul University • Demo prototype</footer>
+  </div>
+
+  <script>
+    // Simple client-side filtering and interactions (no backend)
+    let activeDept = 'all';
+    function chooseDept(el){
+      document.querySelectorAll('#deptChips .chip').forEach(c=>c.classList.remove('active'));
+      el.classList.add('active');
+      activeDept = el.dataset.dept;
+      applyFilters();
+    }
+    function applyFilters(){
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      document.querySelectorAll('.event').forEach(ev=>{
+        const dept = ev.dataset.dept;
+        const keywords = ev.dataset.keywords || '';
+        const matchesDept = (activeDept==='all' || activeDept==='meta') ? true : (dept===activeDept);
+        const matchesQuery = q==='' || ev.innerText.toLowerCase().includes(q) || keywords.includes(q);
+        ev.style.display = (matchesDept && matchesQuery) ? 'block' : 'none';
+      });
+    }
+    function toggleInterested(btn){
+      btn.classList.toggle('active');
+      btn.textContent = btn.classList.contains('active') ? 'Marked' : 'Interested';
+    }
+    function filterByTag(tag){
+      document.querySelectorAll('.event').forEach(ev=>{
+        const tags = ev.querySelectorAll('.tag');
+        const has = Array.from(tags).some(t=>t.innerText.toLowerCase()===tag.toLowerCase());
+        ev.style.display = has ? 'block' : 'none';
+      });
+    }
+    function scrollToSection(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:'smooth'});
+    }
+  </script>
+</body>
+</html>
